@@ -40,16 +40,25 @@ describe "user stories" do
   # I need to touch in and out.
   it "So that I can get in through the barriers, I need to touch in" do
     oyster = Oystercard.new
+    oyster.top_up(20)
     oyster.touch_in
     expect(oyster.in_journey?).to eq true
   end
 
   it "So that I can get out the barriers, I need to touch out" do
     oyster = Oystercard.new
+    oyster.top_up(20)
     oyster.touch_in
     oyster.touch_out
     expect(oyster.in_journey?).to eq false
   end
 
+  # In order to pay for my journey
+  # As a customer
+  # I need to have the minimum amount (£1) for a single journey.
+  it "So that I can travel my balance needs to have a minumum of £1 " do
+    oyster = Oystercard.new
+    expect {oyster.touch_in}.to raise_error "Insufficient funds: you need at least £#{Oystercard::MIN_BALANCE}"
+  end
 
 end
