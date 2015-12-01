@@ -15,7 +15,7 @@ subject(:oyster) { described_class.new }
 
   it "Will raise error if user tries to increase the balance past £90" do
     allow(oyster).to receive(:balance).and_return(90)
-    expect{oyster.top_up(10000)}.to raise_error "£90 maximum limit would be exceeded!"
+    expect{oyster.top_up(10)}.to raise_error "The £#{Oystercard::MAX_BALANCE} maximum limit would be exceeded!"
   end
 
 end

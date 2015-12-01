@@ -17,8 +17,6 @@ describe "user stories" do
     expect {oyster.top_up(10)}.not_to raise_error
   end
 
-  # In order to protect my money from theft or loss
-  # As a customer
-  # I want a maximum limit (of £90) on my card
+
 
 end
