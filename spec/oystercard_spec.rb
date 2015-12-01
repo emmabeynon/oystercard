@@ -10,7 +10,7 @@ let(:station) {double :station}
     end
 
     it "has a default state of not in journey" do
-      expect(oyster).not_to be_in_journey
+      expect(oyster.entry_station).to be_nil
     end
   end
 
@@ -39,8 +39,7 @@ let(:station) {double :station}
       end
 
       it "allows a user to touch in" do
-        oyster.touch_in(station)
-        expect(oyster).to be_in_journey
+        expect{ oyster.touch_in(station) }.not_to raise_error
       end
 
       it "records the entry station" do
@@ -67,8 +66,7 @@ let(:station) {double :station}
       end
 
       it "allows a user to touch out" do
-        oyster.touch_out(station)
-        expect(oyster).not_to be_in_journey
+        expect {oyster.touch_out(station)}.not_to raise_error
       end
 
       it "resets entry station" do

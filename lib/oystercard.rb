@@ -14,16 +14,12 @@ class Oystercard
   end
 
   def top_up(amount)
-    fail "The £#{MAX_BALANCE} maximum limit would be exceeded!" if limit_reached?(amount)
+    fail "£#{MAX_BALANCE} balance limit exceeded. Choose a smaller amount." if limit_reached?(amount)
     @balance += amount
   end
 
-  def limit_reached?(amount)
-    (@balance + amount) >= 90
-  end
-
   def touch_in(station)
-    fail "Insufficient funds: you need at least £#{MIN_FARE} to travel" if insufficient_funds?
+    fail "Can't touch in: you need at least £#{MIN_FARE} to travel" if insufficient_funds?
     @entry_station = station
   end
 
@@ -37,10 +33,6 @@ class Oystercard
     @entry_station = nil
   end
 
-  def in_journey?
-    !!entry_station
-  end
-
 private
   def insufficient_funds?
     @balance < MIN_FARE
@@ -50,5 +42,11 @@ private
     @balance -= amount
   end
 
+  def limit_reached?(amount)
+    (@balance + amount) >= 90
+  end
 
+  def in_journey?
+    !!entry_station
+  end
 end
