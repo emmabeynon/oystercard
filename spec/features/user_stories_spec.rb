@@ -1,6 +1,7 @@
 require 'oystercard'
 
-describe "user stories" do
+
+describe "User stories" do
 
   # In order to use public transport
   # As a customer
@@ -32,14 +33,14 @@ describe "user stories" do
   it "So that I can get in through the barriers, I need to touch in" do
     oyster = Oystercard.new
     oyster.top_up(20)
-    oyster.touch_in
+    oyster.touch_in("Canary Wharf")
     expect(oyster.in_journey?).to eq true
   end
 
   it "So that I can get out the barriers, I need to touch out" do
     oyster = Oystercard.new
     oyster.top_up(20)
-    oyster.touch_in
+    oyster.touch_in("Canary Wharf")
     oyster.touch_out
     expect(oyster.in_journey?).to eq false
   end
@@ -49,7 +50,7 @@ describe "user stories" do
   # I need to have the minimum amount (£1) for a single journey.
   it "So that I can travel my balance needs to have a minumum of £1 " do
     oyster = Oystercard.new
-    expect {oyster.touch_in}.to raise_error "Insufficient funds: you need at least £#{Oystercard::MIN_FARE} to travel"
+    expect {oyster.touch_in("Canary Wharf")}.to raise_error "Insufficient funds: you need at least £#{Oystercard::MIN_FARE} to travel"
   end
 
   # In order to pay for my journey
@@ -63,9 +64,29 @@ describe "user stories" do
   it "So that I get charge the right amount, I want to be charged the right amount" do
     oyster = Oystercard.new
     oyster.top_up(20)
-    oyster.touch_in
+    oyster.touch_in("Canary Wharf")
     expect {oyster.touch_out}.to change{oyster.balance}.by(-(Oystercard::MIN_FARE))
   end
+
+  # In order to pay for my journey
+  # As a customer
+  # I need to know where I've travelled from
+
+  it "So that I can pay, I need to know where I've travelled from" do
+    oyster = Oystercard.new
+    oyster.top_up(10)
+    oyster.touch_in("Canary Wharf")
+    expect(oyster.entry_station).to eq "Canary Wharf"
+  end
+
+  it "So that I can make another journey, I want the entry station to reset on exit" do
+    oyster = Oystercard.new
+    oyster.top_up(10)
+    oyster.touch_in("Canary Wharf")
+    oyster.touch_out
+    expect(oyster.entry_station).to be_nil
+  end
+
 
 
 end
