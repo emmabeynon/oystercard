@@ -22,4 +22,19 @@ subject(:oyster) { described_class.new }
     expect{oyster.deduct(10)}.to change{oyster.balance}.by -10
   end
 
+  it "Should allow me to touch in" do
+    oyster.touch_in
+    expect(oyster).to be_in_journey
+  end
+
+  it "Should let me touch out" do
+    oyster.touch_in
+    oyster.touch_out
+    expect(oyster).not_to be_in_journey
+  end
+
+  it "Should have a default state of not in journey" do
+    expect(oyster).not_to be_in_journey
+  end
+
 end

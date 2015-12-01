@@ -35,5 +35,21 @@ describe "user stories" do
     expect{oyster.deduct(10)}.to change{oyster.balance}.by -10
   end
 
+  # In order to get through the barriers.
+  # As a customer
+  # I need to touch in and out.
+  it "So that I can get in through the barriers, I need to touch in" do
+    oyster = Oystercard.new
+    oyster.touch_in
+    expect(oyster.in_journey?).to eq true
+  end
+
+  it "So that I can get out the barriers, I need to touch out" do
+    oyster = Oystercard.new
+    oyster.touch_in
+    oyster.touch_out
+    expect(oyster.in_journey?).to eq false
+  end
+
 
 end
