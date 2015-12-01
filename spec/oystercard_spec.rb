@@ -17,10 +17,7 @@ subject(:oyster) { described_class.new }
     expect{oyster.top_up(Oystercard::MAX_BALANCE+10)}.to raise_error "The £#{Oystercard::MAX_BALANCE} maximum limit would be exceeded!"
   end
 
-  it "Should deduct the fair from the balance" do
-    oyster.top_up(20)
-    expect{oyster.deduct(10)}.to change{oyster.balance}.by -10
-  end
+
 
   it "Should allow me to touch in" do
     oyster.top_up(20)
@@ -39,7 +36,16 @@ subject(:oyster) { described_class.new }
     expect(oyster).not_to be_in_journey
   end
 
-  it "Should raise an error when the balance is below £#{Oystercard::MIN_BALANCE}" do
-    expect {oyster.touch_in}.to raise_error "Insufficient funds: you need at least £#{Oystercard::MIN_BALANCE}"
+  it "Should raise an error when the balance is below £#{Oystercard::MIN_FARE}" do
+    expect {oyster.touch_in}.to raise_error "Insufficient funds: you need at least £#{Oystercard::MIN_FARE} to travel"
   end
+
+  it "Charges the user the correct amount" do
+    oyster.top_up(20)
+    oyster.touch_in
+    expect {oyster.touch_out}.to change{oyster.balance}.by(-(Oystercard::MIN_FARE))
+  end
+
+
+
 end

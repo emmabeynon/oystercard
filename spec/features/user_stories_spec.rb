@@ -26,15 +26,6 @@ describe "user stories" do
     expect {oyster.top_up(Oystercard::MAX_BALANCE+10)}.to raise_error "The £#{Oystercard::MAX_BALANCE} maximum limit would be exceeded!"
   end
 
-  # In order to pay for my journey
-  # As a customer
-  # I need my fare deducted from my card
-  it "So that I can travel, I need the correct amount to be deducted for each journey. " do
-    oyster = Oystercard.new
-    oyster.top_up(80)
-    expect{oyster.deduct(10)}.to change{oyster.balance}.by -10
-  end
-
   # In order to get through the barriers.
   # As a customer
   # I need to touch in and out.
@@ -58,7 +49,23 @@ describe "user stories" do
   # I need to have the minimum amount (£1) for a single journey.
   it "So that I can travel my balance needs to have a minumum of £1 " do
     oyster = Oystercard.new
-    expect {oyster.touch_in}.to raise_error "Insufficient funds: you need at least £#{Oystercard::MIN_BALANCE}"
+    expect {oyster.touch_in}.to raise_error "Insufficient funds: you need at least £#{Oystercard::MIN_FARE} to travel"
   end
+
+  # In order to pay for my journey
+  # As a customer
+  # I need my fare deducted from my card
+          # AND
+  # In order to pay for my journey
+  # As a customer
+  # When my journey is complete, I need the correct amount deducted from my card
+
+  it "So that I get charge the right amount, I want to be charged the right amount" do
+    oyster = Oystercard.new
+    oyster.top_up(20)
+    oyster.touch_in
+    expect {oyster.touch_out}.to change{oyster.balance}.by(-(Oystercard::MIN_FARE))
+  end
+
 
 end
