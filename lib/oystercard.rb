@@ -3,7 +3,7 @@
 class Oystercard
 
   DEFAULT_BALANCE = 0
-  MAX_BALANCE = 90
+  MAX_BALANCE = 1000
 
   attr_reader :balance
 
