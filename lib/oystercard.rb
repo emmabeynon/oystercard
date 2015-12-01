@@ -3,7 +3,7 @@
 class Oystercard
 
   DEFAULT_BALANCE = 0
-  MAX_BALANCE = 1000
+  MAX_BALANCE = 90
 
   attr_reader :balance
 
@@ -16,8 +16,14 @@ class Oystercard
     @balance += amount
   end
 
-def limit_reached?(amount)
-  (@balance + amount) >= 90
-end
+  def limit_reached?(amount)
+    (@balance + amount) >= 90
+  end
+
+  def deduct(amount)
+    @balance -= amount
+  end
+
+
 
 end
