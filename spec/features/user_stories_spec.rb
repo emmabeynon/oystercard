@@ -41,7 +41,7 @@ describe "User stories" do
     oyster = Oystercard.new
     oyster.top_up(20)
     oyster.touch_in("Canary Wharf")
-    oyster.touch_out
+    oyster.touch_out("Oxford Circus")
     expect(oyster.in_journey?).to eq false
   end
 
@@ -65,7 +65,7 @@ describe "User stories" do
     oyster = Oystercard.new
     oyster.top_up(20)
     oyster.touch_in("Canary Wharf")
-    expect {oyster.touch_out}.to change{oyster.balance}.by(-(Oystercard::MIN_FARE))
+    expect {oyster.touch_out("Oxford Circus")}.to change{oyster.balance}.by(-(Oystercard::MIN_FARE))
   end
 
   # In order to pay for my journey
@@ -83,9 +83,27 @@ describe "User stories" do
     oyster = Oystercard.new
     oyster.top_up(10)
     oyster.touch_in("Canary Wharf")
-    oyster.touch_out
+    oyster.touch_out("Oxford Circus")
     expect(oyster.entry_station).to be_nil
   end
+
+  # In order to know where I have been
+  # As a customer
+  # I want to see to all my previous trips
+
+  it "So that I know where I've been, I wanted to see my previous trips" do
+    oyster = Oystercard.new
+    oyster.top_up(10)
+    oyster.touch_in("Canary Wharf")
+    oyster.touch_out("Oxford Circus")
+    expect(oyster.journey_history).to eq {"Journey 1" => ["Canary Wharf", "Oxford Circus"]}
+  end
+
+
+
+
+
+
 
 
 
