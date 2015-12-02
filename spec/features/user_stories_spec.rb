@@ -1,5 +1,5 @@
 require 'oystercard'
-
+require 'station'
 
 describe "User stories" do
 
@@ -99,7 +99,15 @@ describe "User stories" do
     oyster.top_up(10)
     oyster.touch_in("Canary Wharf")
     oyster.touch_out("Oxford Circus")
-    expect(oyster.journey_history["Journey 1"]).to eq ["Canary Wharf", "Oxford Circus"]
+    expect(oyster.journey_history).to include({"Canary Wharf" => "Oxford Circus"})
   end
 
+  # In order to know how far I have travelled
+  # As a customer
+  # I want to know what zone a station is in
+
+  it "Tells me what zone a station is in" do
+    station = Station.new
+    expect(station).to respond_to :zone
+  end
 end

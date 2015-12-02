@@ -90,7 +90,7 @@ let(:exit_station) {double :station}
     end
   end
 
-  describe '#history' do
+  describe '#journey_history' do
     context "when there is a balance on the card and journey is complete" do
       before do
         oyster.top_up(20)
@@ -98,7 +98,7 @@ let(:exit_station) {double :station}
         oyster.touch_out(exit_station)
       end
       it "after touching in and touching out, shows one journey" do
-        expect(oyster.journey_history["Journey 1"]).to eq [entry_station, exit_station]
+        expect(oyster.journey_history).to include({entry_station => exit_station})
       end
     end
   end
