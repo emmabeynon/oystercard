@@ -107,7 +107,12 @@ describe "User stories" do
   # I want to know what zone a station is in
 
   it "Tells me what zone a station is in" do
-    station = Station.new
-    expect(station).to respond_to :zone
+    station = Station.new("Whitechapel", 2)
+    expect(station.name).to eq "Whitechapel"
+  end
+
+  it "Tells me what the station's name is" do
+    station = Station.new("Whitechapel", 2)
+    expect(station.zone).to eq 2
   end
 end
