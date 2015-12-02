@@ -2,7 +2,8 @@ require 'oystercard'
 
 describe Oystercard do
 subject(:oyster) { described_class.new }
-let(:station) {double :station}
+let(:entry_station) {double :station}
+let(:exit_station) {double :station}
 
   describe 'default' do
     it "has a default balance of zero" do
@@ -11,6 +12,10 @@ let(:station) {double :station}
 
     it "has a default state of not in journey" do
       expect(oyster.entry_station).to be_nil
+    end
+
+    it "has a an empty list of journeys" do
+      expect(oyster.journey_history).to be_empty
     end
   end
 
@@ -39,19 +44,19 @@ let(:station) {double :station}
       end
 
       it "allows a user to touch in" do
-        expect{ oyster.touch_in(station) }.not_to raise_error
+        expect{ oyster.touch_in(entry_station) }.not_to raise_error
       end
 
       it "records the entry station" do
-        oyster.touch_in(station)
-        expect(oyster.entry_station).to eq station
+        oyster.touch_in(entry_station)
+        expect(oyster.entry_station).to eq entry_station
       end
     end
 
     context "when there is no balance on the card" do
       it "Should raise an error when the balance is below £#{Oystercard::MIN_FARE}" do
         message = "Can't touch in: you need at least £#{Oystercard::MIN_FARE} to travel"
-        expect {oyster.touch_in(station)}.to raise_error message
+        expect {oyster.touch_in(entry_station)}.to raise_error message
       end
     end
   end
@@ -59,42 +64,42 @@ let(:station) {double :station}
 
   describe '#touch_out' do
 
-    context "when there is a balance on the card" do
+    context "when there is a balance on the card and user has touched in" do
       before do
         oyster.top_up(20)
-        oyster.touch_in(station)
+        oyster.touch_in(entry_station)
       end
 
       it "allows a user to touch out" do
-        expect {oyster.touch_out(station)}.not_to raise_error
+        expect {oyster.touch_out(exit_station)}.not_to raise_error
       end
 
       it "resets entry station" do
-        oyster.touch_out(station)
+        oyster.touch_out(exit_station)
         expect(oyster.entry_station).to be_nil
       end
 
       it "deducts the fare from the balance" do
-        expect {oyster.touch_out(station)}.to change{oyster.balance}.by(-(Oystercard::MIN_FARE))
+        expect {oyster.touch_out(exit_station)}.to change{oyster.balance}.by(-(Oystercard::MIN_FARE))
       end
 
       it "records the exit station" do
-        oyster.touch_out(station)
-        expect(oyster.exit_station).to eq station
+        oyster.touch_out(exit_station)
+        expect(oyster.exit_station).to eq exit_station
       end
     end
   end
 
-  # describe '#history' do
-  #   context "when there is a balance on the card" do
-  #     before do
-  #       oyster.top_up(20)
-  #     end
-  #   it "Should allow user to view history" do
-  #     oyster.touch_in(station)
-  #     oyster.touch_out(station)
-  #     expect(oyster.journey_history).to return({"Journey 1" => [station, station]})
-  #     end
-  #   end
-  # end
+  describe '#history' do
+    context "when there is a balance on the card and journey is complete" do
+      before do
+        oyster.top_up(20)
+        oyster.touch_in(entry_station)
+        oyster.touch_out(exit_station)
+      end
+      it "after touching in and touching out, shows one journey" do
+        expect(oyster.journey_history["Journey 1"]).to eq [entry_station, exit_station]
+      end
+    end
+  end
 end
