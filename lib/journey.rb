@@ -8,16 +8,20 @@ class Journey
     @entry_station = entry_station
     @exit_station = nil
     @journey = {}
-    @fare = MIN_FARE
+    @fare = PENALTY_FARE
   end
 
   def fare_calculation
-    entry_station == nil || exit_station == nil ?
-      @fare = PENALTY_FARE : @fare = MIN_FARE
+     complete? ? @fare = MIN_FARE : @fare = PENALTY_FARE
   end
 
   def complete_journey(station)
     @exit_station = station
   end
 
+  private
+
+  def complete?
+    entry_station != nil && exit_station != nil
+  end
 end

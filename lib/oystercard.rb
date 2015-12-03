@@ -29,7 +29,7 @@ class Oystercard
   end
 
   def touch_out(station)
-    @journey = Journey.new if @journey == nil
+    self.journey = Journey.new if journey == nil
     journey.complete_journey(station)
     deduct(journey.fare_calculation)
     journey_history << journey
