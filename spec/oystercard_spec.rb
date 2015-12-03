@@ -2,9 +2,11 @@ require 'oystercard'
 
 describe Oystercard do
 subject(:oyster) { described_class.new }
-let(:entry_station) {double :station}
-let(:exit_station) {double :station}
-
+let(:entry_station) {:KingCross}
+let(:exit_station) {:Barking}
+let(:failed_entry_station) {nil}
+Journey = let(:journey) {double :journey, entry_station: :KingCross, exit_station: :Barking}
+let(:no_touch_in_station) {double :journey, entry_station: nil, exit_station: :Barking}
   describe 'default' do
     it "has a default balance of zero" do
       expect(oyster.balance).to eq 0
@@ -49,13 +51,14 @@ let(:exit_station) {double :station}
 
       it "records the entry station" do
         oyster.touch_in(entry_station)
-        expect(oyster.entry_station).to eq entry_station
+        expect(journey.entry_station).to eq entry_station
       end
     end
 
     context "when there is no balance on the card" do
-      it "Should raise an error when the balance is below £#{Oystercard::MIN_FARE}" do
-        message = "Can't touch in: you need at least £#{Oystercard::MIN_FARE} to travel"
+      it "Should raise an error when the balance is below minumum fare" do
+        stub_const("MIN_FARE", 1)
+        message = "Can't touch in: you need at least £#{MIN_FARE} to travel"
         expect {oyster.touch_in(entry_station)}.to raise_error message
       end
     end
@@ -71,6 +74,7 @@ let(:exit_station) {double :station}
       end
 
       it "allows a user to touch out" do
+        oyster.touch_in(entry_station)
         expect {oyster.touch_out(exit_station)}.not_to raise_error
       end
 
@@ -80,13 +84,21 @@ let(:exit_station) {double :station}
       end
 
       it "deducts the fare from the balance" do
-        expect {oyster.touch_out(exit_station)}.to change{oyster.balance}.by(-(Oystercard::MIN_FARE))
+        stub_const("MIN_FARE", 1)
+        expect {oyster.touch_out(exit_station)}.to change{oyster.balance}.by(-(MIN_FARE))
       end
 
       it "records the exit station" do
         oyster.touch_out(exit_station)
-        expect(oyster.exit_station).to eq exit_station
+        expect(no_touch_in_station.entry_station).to eq nil
       end
+
+      context "when user has not touched in"
+        it 'it creates a new journey' do
+          oyster.touch_out(exit_station)  #
+          expect(oyster.entry_station).to eq nil
+        end
+
     end
   end
 
@@ -98,7 +110,7 @@ let(:exit_station) {double :station}
         oyster.touch_out(exit_station)
       end
       it "after touching in and touching out, shows one journey" do
-        expect(oyster.journey_history).to include({entry_station => exit_station})
+        expect(oyster.journey_history).to include(oyster.journey)
       end
     end
   end

@@ -1,5 +1,6 @@
 require 'oystercard'
 require 'station'
+require 'journey'
 
 describe "User stories" do
 
@@ -48,7 +49,7 @@ describe "User stories" do
   # I need to have the minimum amount (£1) for a single journey.
   it "So that I can travel, my balance needs to be a minumum of £1 " do
     oyster = Oystercard.new
-    expect {oyster.touch_in("Canary Wharf")}.to raise_error "Can't touch in: you need at least £#{Oystercard::MIN_FARE} to travel"
+    expect {oyster.touch_in("Canary Wharf")}.to raise_error "Can't touch in: you need at least £#{Journey::MIN_FARE} to travel"
   end
 
   # In order to pay for my journey
@@ -63,7 +64,7 @@ describe "User stories" do
     oyster = Oystercard.new
     oyster.top_up(20)
     oyster.touch_in("Canary Wharf")
-    expect {oyster.touch_out("Oxford Circus")}.to change{oyster.balance}.by(-(Oystercard::MIN_FARE))
+    expect {oyster.touch_out("Oxford Circus")}.to change{oyster.balance}.by(-(Journey::MIN_FARE))
   end
 
   # In order to pay for my journey
@@ -74,7 +75,7 @@ describe "User stories" do
     oyster = Oystercard.new
     oyster.top_up(10)
     oyster.touch_in("Canary Wharf")
-    expect(oyster.entry_station).to eq "Canary Wharf"
+    expect(oyster.journey.entry_station).to eq "Canary Wharf"
   end
 
   it "So that I can make another journey, I want the entry station to reset on exit" do
@@ -99,7 +100,7 @@ describe "User stories" do
     oyster.top_up(10)
     oyster.touch_in("Canary Wharf")
     oyster.touch_out("Oxford Circus")
-    expect(oyster.journey_history).to include({"Canary Wharf" => "Oxford Circus"})
+    expect(oyster.journey_history).to include(oyster.journey)
   end
 
   # In order to know how far I have travelled
