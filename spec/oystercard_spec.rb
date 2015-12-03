@@ -5,8 +5,10 @@ subject(:oyster) { described_class.new }
 let(:entry_station) {:KingCross}
 let(:exit_station) {:Barking}
 let(:failed_entry_station) {nil}
-Journey = let(:journey) {double :journey, entry_station: :KingCross, exit_station: :Barking}
-let(:no_touch_in_station) {double :journey, entry_station: nil, exit_station: :Barking}
+let(:journey) {double :journey, entry_station: :KingCross,
+  exit_station: :Barking}
+let(:no_touch_in_station) {double :journey, entry_station: nil,
+  exit_station: :Barking}
   describe 'default' do
     it "has a default balance of zero" do
       expect(oyster.balance).to eq 0
@@ -32,7 +34,8 @@ let(:no_touch_in_station) {double :journey, entry_station: nil, exit_station: :B
       end
 
       it "raises an error if user tries to increase the balance over £90" do
-        message = "£#{Oystercard::MAX_BALANCE} balance limit exceeded. Choose a smaller amount."
+        message = "£#{Oystercard::MAX_BALANCE} balance limit exceeded."\
+        " Choose a smaller amount."
         expect{oyster.top_up(Oystercard::MAX_BALANCE)}.to raise_error message
       end
     end
@@ -85,7 +88,8 @@ let(:no_touch_in_station) {double :journey, entry_station: nil, exit_station: :B
 
       it "deducts the fare from the balance" do
         stub_const("MIN_FARE", 1)
-        expect {oyster.touch_out(exit_station)}.to change{oyster.balance}.by(-(MIN_FARE))
+        expect {oyster.touch_out(exit_station)}.to change{oyster.balance}
+          .by(-(MIN_FARE))
       end
 
       it "records the exit station" do
