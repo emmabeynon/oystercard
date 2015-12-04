@@ -18,9 +18,7 @@ let(:no_touch_in_station) {double :journey, entry_station: nil,
       expect(oyster.entry_station).to be_nil
     end
 
-    it "has a an empty list of journeys" do
-      expect(oyster.journey_history).to be_empty
-    end
+
   end
 
   describe '#top_up' do
@@ -106,16 +104,5 @@ let(:no_touch_in_station) {double :journey, entry_station: nil,
     end
   end
 
-  describe '#journey_history' do
-    context "when there is a balance on the card and journey is complete" do
-      before do
-        oyster.top_up(20)
-        oyster.touch_in(entry_station)
-        oyster.touch_out(exit_station)
-      end
-      it "after touching in and touching out, shows one journey" do
-        expect(oyster.journey_history).to include(oyster.journey)
-      end
-    end
   end
 end

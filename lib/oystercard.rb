@@ -11,7 +11,6 @@ class Oystercard
 
   def initialize
     @balance = DEFAULT_BALANCE
-    @journey_history = []
     @journey = nil
   end
 
@@ -32,7 +31,6 @@ class Oystercard
     self.journey = Journey.new if journey == nil
     journey.complete_journey(station)
     deduct(journey.fare_calculation)
-    journey_history << journey
   end
 
 private
