@@ -1,13 +1,42 @@
 require 'oystercard'
 require 'station'
 require 'journey'
+require 'journey_log'
 
 describe "User stories" do
-  describe 'JourneyLog' do
+  subject(:oyster) { Oystercard.new }
+  subject(:station) { Station.new("Whitechapel", 2) }
+  subject(:journey) { Journey.new }
+  subject(:journey_log) { JourneyLog.new(Journey.new) }
 
+  describe 'JourneyLog' do
+    # In order to know where I have been
+    # As a customer
+    # I want to see to all my previous trips
+
+    it "has an empty list of journeys by default" do
+      expect(journey_log.journey_history).to be_empty
+    end
+
+    it "shows user a list of previous journeys" do
+      oyster.top_up(10)
+      oyster.touch_in("Canary Wharf")
+      oyster.touch_out("Oxford Circus")
+      expect(oyster.journey_log.journey_history).not_to be_empty
+    end
   end
 
   describe 'Journey' do
+    # In order to pay for my journey
+    # As a customer
+    # I need to know where I've travelled from
+
+    it "shows user where they have travelled from" do
+      oyster.top_up(10)
+      oyster.touch_in("Canary Wharf")
+      expect(oyster.journey_log.journey.entry_station).to eq "Canary Wharf"
+    end
+
 
   end
 
@@ -15,38 +44,34 @@ describe "User stories" do
     # In order to use public transport
     # As a customer
     # I want money on my card
-    it "So that I can use public transport, I need money on the card" do
-      oyster = Oystercard.new
+    it "has a balance" do
       expect {oyster.balance}.not_to raise_error
     end
 
     # In order to keep using public transport
     # As a customer
     # I want to add money to my card
-    it "So that I can keep using public transport, I need to be able to top up" do
-      oyster = Oystercard.new
+    it "allows user to top up their balance" do
       expect {oyster.top_up(10)}.not_to raise_error
     end
 
     # In order to protect my money from theft or loss
     # As a customer
     # I want a maximum limit (of £90) on my card
-    it "So that I can protect my money, I want a max limit of £#{Oystercard::MAX_BALANCE}" do
-      oyster = Oystercard.new
-      expect {oyster.top_up(Oystercard::MAX_BALANCE+10)}.to raise_error "£#{Oystercard::MAX_BALANCE} balance limit exceeded. Choose a smaller amount."
+    it "has a max balance of £#{Oystercard::MAX_BALANCE}" do
+      message = "£#{Oystercard::MAX_BALANCE} balance limit exceeded. Choose a smaller amount."
+      expect {oyster.top_up(Oystercard::MAX_BALANCE+10)}.to raise_error message
     end
 
     # In order to get through the barriers.
     # As a customer
     # I need to touch in and out.
-    it "So that I can enter the barriers, I need to touch in" do
-      oyster = Oystercard.new
+    it "allows user to touch in" do
       oyster.top_up(20)
       expect{ oyster.touch_in("Canary Wharf") }.not_to raise_error
     end
 
-    it "So that I can exit the barriers, I need to touch out" do
-      oyster = Oystercard.new
+    it "allows user to touch out" do
       oyster.top_up(20)
       oyster.touch_in("Canary Wharf")
       expect{ oyster.touch_out("Oxford Circus") }.not_to raise_error
@@ -55,9 +80,9 @@ describe "User stories" do
     # In order to pay for my journey
     # As a customer
     # I need to have the minimum amount (£1) for a single journey.
-    it "So that I can travel, my balance needs to be a minumum of £1 " do
-      oyster = Oystercard.new
-      expect {oyster.touch_in("Canary Wharf")}.to raise_error "Can't touch in: you need at least £#{Journey::MIN_FARE} to travel"
+    it "raises an error if the user's balance isn't a minumum of £1 " do
+      message = "Can't touch in: you need at least £#{Journey::MIN_FARE} to travel"
+      expect {oyster.touch_in("Canary Wharf")}.to raise_error message
     end
 
     # In order to pay for my journey
@@ -68,48 +93,25 @@ describe "User stories" do
     # As a customer
     # When my journey is complete, I need the correct amount deducted from my card
 
-    it "So that I can pay for my journey, I needs the right amount deducted from my card" do
-      oyster = Oystercard.new
+    it "deducts the minimum fare if the user completes their journey" do
       oyster.top_up(20)
       oyster.touch_in("Canary Wharf")
-      expect {oyster.touch_out("Oxford Circus")}.to change{oyster.balance}.by(-(Journey::MIN_FARE))
+      expect{oyster.touch_out("Oxford Circus")}.to change{oyster.balance}.by(-Journey::MIN_FARE)
     end
 
-    # In order to pay for my journey
-    # As a customer
-    # I need to know where I've travelled from
-
-    it "So that I can pay for my journey, I need to know where I've travelled from" do
-      oyster = Oystercard.new
-      oyster.top_up(10)
+    it 'deducts a penalty fare if the user does not touch out' do
+      oyster.top_up(20)
       oyster.touch_in("Canary Wharf")
-      expect(oyster.journey.entry_station).to eq "Canary Wharf"
+      oyster.incomplete_journey
+      expect(oyster.balance).to eq(20-Journey::PENALTY_FARE)
     end
 
-    it "So that I can make another journey, I want the entry station to reset on exit" do
-      oyster = Oystercard.new
-      oyster.top_up(10)
-      oyster.touch_in("Canary Wharf")
-      oyster.touch_out("Oxford Circus")
-      expect(oyster.entry_station).to be_nil
+    it 'deducts a penalty fare if the user does not touch out' do
+      oyster.top_up(20)
+      oyster.touch_out("Canary Wharf")
+      expect(oyster.balance).to eq(20-Journey::PENALTY_FARE)
     end
 
-    # In order to know where I have been
-    # As a customer
-    # I want to see to all my previous trips
-
-    it "The card should have an empty list of journeys by default" do
-      oyster = Oystercard.new
-      expect(oyster.journey_history).to be_empty
-    end
-
-    it "So that I know where I've been, I want to see my previous trips" do
-      oyster = Oystercard.new
-      oyster.top_up(10)
-      oyster.touch_in("Canary Wharf")
-      oyster.touch_out("Oxford Circus")
-      expect(oyster.journey_history).to include(oyster.journey)
-    end
   end
 
   describe 'Station' do
@@ -117,13 +119,11 @@ describe "User stories" do
     # As a customer
     # I want to know what zone a station is in
 
-    it "Tells me what zone a station is in" do
-      station = Station.new("Whitechapel", 2)
+    it "tells user what zone a station is in" do
       expect(station.name).to eq "Whitechapel"
     end
 
-    it "Tells me what the station's name is" do
-      station = Station.new("Whitechapel", 2)
+    it "tells user what the station's name is" do
       expect(station.zone).to eq 2
     end
   end

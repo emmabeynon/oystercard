@@ -14,17 +14,18 @@ describe Journey do
       journey = described_class.new
       expect(journey.entry_station).to be_nil
     end
+
   end
 
   describe '#fare_calculation' do
     it 'returns a penalty fare if entry station is nil' do
-      entry_station = nil
+      allow(journey).to receive(:entry_station) { "No station recorded"}
       journey.fare_calculation
       expect(journey.fare).to eq Journey::PENALTY_FARE
     end
 
     it 'returns a penalty fare if exit station is nil' do
-      exit_station = nil
+      allow(journey).to receive(:exit_station) { "No station recorded"}
       journey.fare_calculation
       expect(journey.fare).to eq Journey::PENALTY_FARE
     end

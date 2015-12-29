@@ -7,7 +7,6 @@ class Journey
   def initialize(entry_station=nil)
     @entry_station = entry_station
     @exit_station = nil
-    @journey = {}
     @fare = PENALTY_FARE
   end
 
@@ -17,11 +16,12 @@ class Journey
 
   def complete_journey(station)
     @exit_station = station
+    fare_calculation
   end
 
   private
 
   def complete?
-    entry_station != nil && exit_station != nil
+    entry_station != "No station recorded" && exit_station != "No station recorded"
   end
 end
