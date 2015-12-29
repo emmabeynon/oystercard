@@ -11,17 +11,17 @@ class JourneyLog
 
   def start_journey(entry_station)
     @journey = journey_klass.new(entry_station)
+    record_journey(journey)
   end
 
   def exit_journey(exit_station)
-    @journey = journey_klass.new("No station recorded") if @journey == nil
+    start_journey("No station recorded") unless in_journey?
     journey.complete_journey(exit_station)
-    record_journey(journey)
     @journey = nil
   end
 
   def journeys
-    journey_history
+    journey_history.dup
   end
 
   def outstanding_charges
@@ -33,15 +33,10 @@ class JourneyLog
     journey_history.last.fare
   end
 
-
   private
 
   def in_journey?
-    if @journey != nil
-      true
-    else
-      false
-    end
+    journey != nil
   end
 
   def record_journey(journey)

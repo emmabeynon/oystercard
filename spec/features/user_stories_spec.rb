@@ -8,20 +8,21 @@ describe "User stories" do
   subject(:station) { Station.new("Whitechapel", 2) }
   subject(:journey) { Journey.new }
   subject(:journey_log) { JourneyLog.new(Journey.new) }
+  subject(:brockley) { Station.new("Brockley", 2)}
+  subject(:forest_hill) { Station.new("Forest Hill", 3)}
 
   describe 'JourneyLog' do
     # In order to know where I have been
     # As a customer
     # I want to see to all my previous trips
-
     it "has an empty list of journeys by default" do
       expect(journey_log.journey_history).to be_empty
     end
 
     it "shows user a list of previous journeys" do
       oyster.top_up(10)
-      oyster.touch_in("Canary Wharf")
-      oyster.touch_out("Oxford Circus")
+      oyster.touch_in(brockley)
+      oyster.touch_out(forest_hill)
       expect(oyster.journey_log.journey_history).not_to be_empty
     end
   end
@@ -30,14 +31,21 @@ describe "User stories" do
     # In order to pay for my journey
     # As a customer
     # I need to know where I've travelled from
-
     it "shows user where they have travelled from" do
       oyster.top_up(10)
       oyster.touch_in("Canary Wharf")
       expect(oyster.journey_log.journey.entry_station).to eq "Canary Wharf"
     end
 
-
+    # In order to be charged the correct amount
+    # As a customer
+    # I need to have the correct fare calculated
+    it 'calculates the correct fare for the number of zones travelled' do
+      oyster.top_up(10)
+      oyster.touch_in(forest_hill)
+      oyster.touch_out(brockley)
+      expect(oyster.balance).to eq 8
+    end
   end
 
   describe 'Oystercard' do
@@ -73,8 +81,8 @@ describe "User stories" do
 
     it "allows user to touch out" do
       oyster.top_up(20)
-      oyster.touch_in("Canary Wharf")
-      expect{ oyster.touch_out("Oxford Circus") }.not_to raise_error
+      oyster.touch_in(forest_hill)
+      expect{ oyster.touch_out(brockley) }.not_to raise_error
     end
 
     # In order to pay for my journey
@@ -92,11 +100,10 @@ describe "User stories" do
     # In order to pay for my journey
     # As a customer
     # When my journey is complete, I need the correct amount deducted from my card
-
     it "deducts the minimum fare if the user completes their journey" do
       oyster.top_up(20)
-      oyster.touch_in("Canary Wharf")
-      expect{oyster.touch_out("Oxford Circus")}.to change{oyster.balance}.by(-Journey::MIN_FARE)
+      oyster.touch_in(brockley)
+      expect{oyster.touch_out(brockley)}.to change{oyster.balance}.by(-Journey::MIN_FARE)
     end
 
     it 'deducts a penalty fare if the user does not touch out' do

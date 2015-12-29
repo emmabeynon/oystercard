@@ -34,6 +34,7 @@ class Oystercard
   end
 
 private
+
   def insufficient_funds?
     balance < Journey::MIN_FARE
   end
